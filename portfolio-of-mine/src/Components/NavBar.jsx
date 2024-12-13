@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Navbar, Nav, Container } from "react-bootstrap";
 import { HashLink } from 'react-router-hash-link';
 import { BrowserRouter as Router } from "react-router-dom";
 
 export const NavBar = () => {
-
   const [activeLink, setActiveLink] = useState('home');
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // For mobile menu toggle
 
   useEffect(() => {
     const onScroll = () => {
@@ -15,7 +14,7 @@ export const NavBar = () => {
       } else {
         setScrolled(false);
       }
-    }
+    };
 
     window.addEventListener("scroll", onScroll);
 
@@ -24,31 +23,63 @@ export const NavBar = () => {
 
   const onUpdateActiveLink = (value) => {
     setActiveLink(value);
-  }
+    setMenuOpen(false); // Close menu on link click (for mobile)
+  };
 
   return (
     <Router>
-      <Navbar expand="md" className={scrolled ? "scrolled" : ""}>
-        <Container className="flex justify-around">
-          <h1 className="mt-2">Islem Othmani</h1>
-          <Nav className="mt-2">
-            <Nav.Link href="#home" className={activeLink === 'home' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('home')}>Home</Nav.Link>
-            <Nav.Link href="#about" className={activeLink === 'about' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('about')}>About</Nav.Link>
-            <Nav.Link href="#experience" className={activeLink === 'experience' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('experience')}>Experience</Nav.Link>
-            <Nav.Link href="#education" className={activeLink === 'education' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('education')}>Education</Nav.Link>
-            <Nav.Link href="#projects" className={activeLink === 'projects' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('projects')}>Projects</Nav.Link>
-            <Nav.Link href="#associativeworks" className={activeLink === 'associativeworks' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('associativeworks')}>Associative Works</Nav.Link>
-
-          </Nav>
-          <span className="navbar-text">
-            <div className="social-icon">
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black shadow-lg' : 'bg-transparent'}`}>
+        <div className="container mx-auto flex items-center justify-between px-4 py-3">
+          <h1 className="text-xl font-bold text-white">Islem Othmani</h1>
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-6">
+            {['home', 'about', 'experience', 'education', 'projects', 'associativeworks'].map((link) => (
+              <a
+                key={link}
+                href={`#${link}`}
+                className={`text-sm font-medium transition-colors ${activeLink === link ? 'text-purple-400' : 'text-gray-300 hover:text-purple-400'}`}
+                onClick={() => onUpdateActiveLink(link)}
+              >
+                {link.charAt(0).toUpperCase() + link.slice(1)}
+              </a>
+            ))}
+          </div>
+          <div className="hidden md:block">
+            <HashLink to="#contact">
+              <button className="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition">Contact Me</button>
+            </HashLink>
+          </div>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-white focus:outline-none"
+            >
+              {menuOpen ? "Close" : "Menu"}
+            </button>
+          </div>
+        </div>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="md:hidden bg-black text-white py-4 space-y-4">
+            {['home', 'about', 'experience', 'education', 'projects', 'associativeworks'].map((link) => (
+              <a
+                key={link}
+                href={`#${link}`}
+                className={`block text-sm font-medium text-center transition-colors ${activeLink === link ? 'text-purple-400' : 'text-gray-300 hover:text-purple-400'}`}
+                onClick={() => onUpdateActiveLink(link)}
+              >
+                {link.charAt(0).toUpperCase() + link.slice(1)}
+              </a>
+            ))}
+            <div className="text-center">
               <HashLink to="#contact">
-                <button className="contact-btn">Contact Me</button>
+                <button className="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition">Contact Me</button>
               </HashLink>
             </div>
-          </span>
-        </Container>
-      </Navbar>
+          </div>
+        )}
+      </nav>
     </Router>
   );
 };
